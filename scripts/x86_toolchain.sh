@@ -29,6 +29,10 @@ BITS=True
 QEMU=False
 BREAK="_start"
 RUN=False
+
+options=$(getopt -o go:v32qrb: --long gdb,output:,verbose,x86-32,qemu,run,break: -- "$@")
+eval set -- "$options"
+
 while [[ $# -gt 0 ]]; do
         case $1 in
                 -g|--gdb)
@@ -44,7 +48,7 @@ while [[ $# -gt 0 ]]; do
                         VERBOSE=True
                         shift # past argument
                         ;;
-                -32|--x86-32) 
+                -3|--x86-32) # Getopt only takes one char for short commands (-32 still works correctly)
                         BITS=False
                         shift # past argument
                         ;;
@@ -60,10 +64,6 @@ while [[ $# -gt 0 ]]; do
                         BREAK="$2"
                         shift # past argument
                         shift # past value
-                        ;;
-                -*|--*)
-                        echo "Unknown option $1"
-                        exit 1
                         ;;
                 *)
                         POSITIONAL_ARGS+=("$1") # save positional arg

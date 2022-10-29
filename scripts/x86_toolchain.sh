@@ -32,7 +32,7 @@ BREAK="_start"
 RUN=False
 
 # Use getopt to parse command line options. Can be -(short) and/or --(long).
-options=$(getopt -o go:v3qrb: --long gdb,output:,verbose,x86-32,qemu,run,break: -- "$@")
+options=$(getopt -o go:v32qrb: --long gdb,output:,verbose,x86-32,qemu,run,break: -- "$@")
 
 # Set positional parameters to the result from getopt.
 eval set -- "$options"
@@ -53,7 +53,7 @@ while [[ $# -gt 0 ]]; do # while statement is executed if user enters an argumen
                         VERBOSE=True
                         shift # past argument
                         ;;
-                -3|--x86-32) # Getopt only takes one char for short commands (-32 will no longer work).
+                -3|--x86-32) # Getopt only takes one char for short commands (-32 will still work).
                         BITS=False
                         shift # past argument
                         ;;
@@ -73,10 +73,6 @@ while [[ $# -gt 0 ]]; do # while statement is executed if user enters an argumen
                 --)            # Case '--' is always the last arg of getopt args.
                         shift; # past argument 
                         break  # exit the loop 
-                        ;;
-                *)             # Error case
-                        echo "Option $1 is invalid"
-                        shift # past argument
                         ;;
         esac # ends the above case statement
 done # ends the while loop
@@ -111,12 +107,12 @@ fi
 
 if [ "$BITS" == "True" ]; then # if BITS is true, then nasm will compile the file in 64 bit mode
 
-        nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo "" # object file is created
+        nasm -fPIE elf64 $1 -o $OUTPUT_FILE.o && echo "" # object file is created
 
 
 elif [ "$BITS" == "False" ]; then # if BITS is false, then nasm will compile file in 32 bit mode
 
-        nasm -f elf $1 -o $OUTPUT_FILE.o && echo "" # object file is created
+        nasm -fPIE elf $1 -o $OUTPUT_FILE.o && echo "" # object file is created
 
 fi
 

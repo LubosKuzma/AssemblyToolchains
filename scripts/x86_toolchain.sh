@@ -22,7 +22,6 @@ if [ $# -lt 1 ]; then
         exit 1
 fi
 
-POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False

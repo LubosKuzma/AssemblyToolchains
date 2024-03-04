@@ -95,50 +95,29 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	64 bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
+	echo "GCC started..."
 
 fi
 
 if [ "$BITS" == "True" ]; then
 
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
+	gcc -m64 $1 -o $OUTPUT_FILE && echo ""
 
 
 elif [ "$BITS" == "False" ]; then
 
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
+	gcc $1 -o $OUTPUT_FILE && echo ""
 
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
-	echo "Linking ..."
-	
+	echo "GCC finished"	
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
-	echo "Linking ..."
-fi
-
-if [ "$BITS" == "True" ]; then
-
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-
-elif [ "$BITS" == "False" ]; then
-
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-fi
-
-
-if [ "$VERBOSE" == "True" ]; then
-
-	echo "Linking finished"
-
+	echo "GCC finished"
 fi
 
 if [ "$QEMU" == "True" ]; then

@@ -1,0 +1,35 @@
+.\" Manpage for x86 Tool Chain.
+.TH man 8 "March 5, 2024" "1.0" "x86_toolchain man page"
+.SH NAME
+x86_toolchain \- X86 Assembly Tool Chain
+.SH SYNOPSIS
+x86_toolchain.sh [ options ] <assembly filename> [-o | --output <output filename>]
+.SH DESCRIPTION
+x86 Tool Chain is a program for compiling and debugging X86 Assembly Code.
+.SH OPTIONS
+-v | --verbose                Show some information about steps performed.
+
+-g | --gdb                    Run gdb command on executable.
+
+-b | --break <break point>    Add breakpoint after running gdb. Default is _start.
+
+-r | --run                    Run program in gdb automatically. Same as run command inside gdb env.
+
+-q | --qemu                   Run executable in QEMU emulator. This will execute the program.
+
+-64| --x86-64                 Compile for 64bit (x86-64) system.
+
+-o | --output <filename>      Output filename.
+
+.SH EXAMPLE
+
+./x86_toolchain.sh -v -64 <file path/file name> -g -r
+
+This will compile the X86 assembly showing steps performed, compiled for 64bit system, opening in GDB, and running the program in GDB automatically.
+
+.SH SEE ALSO
+man arm_toolchain
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+x86_toolchain: Lubos Kuzma | man page: Emma Gillespie

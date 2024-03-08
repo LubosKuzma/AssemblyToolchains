@@ -1,0 +1,37 @@
+.\" Manpage for ARM Tool Chain.
+.TH man 8 "March 5, 2024" "1.0" "arm_toolchain man page"
+.SH NAME
+arm_toolchain \- ARM Assembly Tool Chain
+.SH SYNOPSIS
+arm_toolchain.sh  [-p | --port <port number, default 12222>] <assembly filename> [-o | --output <output filename>]
+.SH DESCRIPTION
+ARM Tool Chain is a program for compiling and debugging ARM Assembly Code.
+.SH OPTIONS
+-v | --verbose                Show some information about steps performed.
+
+-g | --gdb                    Run gdb command on executable.
+
+-b | --break <break point>    Add breakpoint after running gdb. Default is _start.
+
+-r | --run                    Run program in gdb automatically. Same as run command inside gdb env.
+
+-q | --qemu                   Run executable in QEMU emulator. This will execute the program.
+
+-p | --port                   Specify a port for communication between QEMU and GDB. Default is 12222.
+
+-64| --x86-64                 Compile for 64bit (x86-64) system.
+
+-o | --output <filename>      Output filename.
+
+.SH EXAMPLE
+
+./arm_toolchain.sh -v -64 <file path/file name> -g -r
+
+This will compile the ARM assembly showing steps performed, compiled for 64bit system, opening in GDB, and running the program in GDB automatically.
+
+.SH SEE ALSO
+man x86_toolchain
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+arm_toolchain: Lubos Kuzma | man page: Emma Gillespie

@@ -1,9 +1,11 @@
 #! /bin/bash
 
-# Created by Lubos Kuzma
+# Created by Dylan Kurulok
 # ISS Program, SADT, SAIT
-# August 2022
-
+# March 2024
+# *******************************************
+# This version has been modified to use GCC
+# *******************************************
 
 if [ $# -lt 1 ]; then
 	echo "Usage:"
@@ -95,80 +97,45 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	64 bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
+	echo "GCC started..."
 
 fi
 
 if [ "$BITS" == "True" ]; then
-
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
-
+	gcc -m64 $1 -o $OUTPUT_FILE && echo ""
 
 elif [ "$BITS" == "False" ]; then
-
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
+	gcc $1 -o $OUTPUT_FILE && echo ""
 
 fi
 
 if [ "$VERBOSE" == "True" ]; then
-
-	echo "NASM finished"
-	echo "Linking ..."
-	
-fi
-
-if [ "$VERBOSE" == "True" ]; then
-
-	echo "NASM finished"
-	echo "Linking ..."
-fi
-
-if [ "$BITS" == "True" ]; then
-
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-
-elif [ "$BITS" == "False" ]; then
-
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-fi
-
-
-if [ "$VERBOSE" == "True" ]; then
-
-	echo "Linking finished"
+	echo "GCC finished"
 
 fi
 
 if [ "$QEMU" == "True" ]; then
-
 	echo "Starting QEMU ..."
 	echo ""
 
-	if [ "$BITS" == "True" ]; then
-	
+	if [ "$BITS" == "True" ]; then	
 		qemu-x86_64 $OUTPUT_FILE && echo ""
-
+	
 	elif [ "$BITS" == "False" ]; then
-
 		qemu-i386 $OUTPUT_FILE && echo ""
 
 	fi
 
 	exit 0
-	
 fi
 
 if [ "$GDB" == "True" ]; then
-
 	gdb_params=()
 	gdb_params+=(-ex "b ${BREAK}")
 
 	if [ "$RUN" == "True" ]; then
-
 		gdb_params+=(-ex "r")
-
+		
 	fi
 
 	gdb "${gdb_params[@]}" $OUTPUT_FILE

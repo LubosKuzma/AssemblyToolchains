@@ -1,8 +1,9 @@
 #! /bin/bash
 
 # Created by Lubos Kuzma
+# 64-bit default Gurjot Girn
 # ISS Program, SADT, SAIT
-# August 2022
+# March 2024
 
 
 if [ $# -lt 1 ]; then
@@ -15,9 +16,8 @@ if [ $# -lt 1 ]; then
 	echo "-b | --break <break point>    Add breakpoint after running gdb. Default is _start."
 	echo "-r | --run                    Run program in gdb automatically. Same as run command inside gdb env."
 	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
-	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
 	echo "-o | --output <filename>      Output filename."
-
+					    #64 bit option removed as setting it to default renders it pointless
 	exit 1
 fi
 
@@ -25,7 +25,7 @@ POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=False
+BITS=True				#Set to true instead, default to 64bit
 QEMU=False
 BREAK="_start"
 RUN=False
@@ -43,11 +43,7 @@ while [[ $# -gt 0 ]]; do
 		-v|--verbose)
 			VERBOSE=True
 			shift # past argument
-			;;
-		-64|--x84-64)
-			BITS=True
-			shift # past argument
-			;;
+			;;				#between -v and -q, removed 64bit as an option
 		-q|--qemu)
 			QEMU=True
 			shift # past argument
@@ -92,23 +88,15 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	Input File = $1"
 	echo "	Output File = $OUTPUT_FILE"
 	echo "	Verbose = $VERBOSE"
-	echo "	64 bit mode = $BITS" 
+	echo "	64 bit mode = Default" 		#Replaced $BITS with Default
 	echo ""
 
 	echo "NASM started..."
 
 fi
-
-if [ "$BITS" == "True" ]; then
-
+									#BITS set to true, removed if
 	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
-
-
-elif [ "$BITS" == "False" ]; then
-
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
-
-fi
+									#Removed False condition
 
 if [ "$VERBOSE" == "True" ]; then
 

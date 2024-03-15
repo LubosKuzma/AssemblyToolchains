@@ -95,7 +95,7 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	64 bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
+	echo "GCC started..."
 
 fi
 

@@ -15,7 +15,7 @@ if [ $# -lt 1 ]; then
 	echo "-b | --break <break point>    Add breakpoint after running gdb. Default is _start."
 	echo "-r | --run                    Run program in gdb automatically. Same as run command inside gdb env."
 	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
-	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
+	echo "-32| --x86	                Compile for 32bit (x86) system."
 	echo "-o | --output <filename>      Output filename."
 
 	exit 1
@@ -25,7 +25,7 @@ POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=False
+BITS=True # changed to true to make 64bit the default
 QEMU=False
 BREAK="_start"
 RUN=False
@@ -44,8 +44,8 @@ while [[ $# -gt 0 ]]; do
 			VERBOSE=True
 			shift # past argument
 			;;
-		-64|--x84-64)
-			BITS=True
+		-32|--x86)
+			BITS=False
 			shift # past argument
 			;;
 		-q|--qemu)
@@ -95,45 +95,33 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	64 bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
+	echo "GCC started..."
 
 fi
 
 if [ "$BITS" == "True" ]; then
 
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
+	gcc -m64 $1 -o $OUTPUT_FILE.o && echo ""
 
 
 elif [ "$BITS" == "False" ]; then
 
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
+	gcc $1 -o $OUTPUT_FILE.o && echo ""
 
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
+	echo "GCC finished"
 	echo "Linking ..."
 	
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
+	echo "GCC finished"
 	echo "Linking ..."
 fi
-
-if [ "$BITS" == "True" ]; then
-
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-
-elif [ "$BITS" == "False" ]; then
-
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-fi
-
 
 if [ "$VERBOSE" == "True" ]; then
 

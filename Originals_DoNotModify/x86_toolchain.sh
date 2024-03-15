@@ -1,5 +1,5 @@
 #! /bin/bash
-
+# edit by Jack Hanel
 # Created by Lubos Kuzma
 # ISS Program, SADT, SAIT
 # August 2022
@@ -36,9 +36,9 @@ while [[ $# -gt 0 ]]; do
 			shift # past argument
 			;;
 		-o|--output)
-			OUTPUT_FILE="$2"
-			shift # past argument
-			shift # past value
+			if [ -z "$2" ]; then
+			echo "ERROR: no file"
+			exit 1 
 			;;
 		-v|--verbose)
 			VERBOSE=True
@@ -57,12 +57,12 @@ while [[ $# -gt 0 ]]; do
 			shift # past argument
 			;;
 		-b|--break)
-			BREAK="$2"
-			shift # past argument
-			shift # past value
+		       if [ -z "$2" ]; then
+			echo "ERROR: no breakpoint"
+			exit 1
 			;;
 		-*|--*)
-			echo "Unknown option $1"
+			echo "ERROR: Unknown option $1"
 			exit 1
 			;;
 		*)
@@ -75,7 +75,7 @@ done
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
 if [[ ! -f $1 ]]; then
-	echo "Specified file does not exist"
+	echo "ERROR: Specified file does not exist"
 	exit 1
 fi
 
@@ -95,49 +95,47 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	64 bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
+	echo "GCC started..."
 
 fi
 
 if [ "$BITS" == "True" ]; then
 
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
+	GCC -o $1 -o $OUTPUT_FILE.o || { echo "ERROR: exicution failed";  exit 1; }
 
 
 elif [ "$BITS" == "False" ]; then
 
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
+	GCC -o $1 -o $OUTPUT_FILE.o || { echo "ERROR: exicution failed";  exit 1; }
 
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
-	echo "Linking ..."
+	echo "GCC finished"
 	
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
-	echo "Linking ..."
+	echo "GCC finished"
 fi
 
 if [ "$BITS" == "True" ]; then
 
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+	GCC -o $OUTPUT_FILE.o -o $OUTPUT_FILE || { echo "ERROR: exicution failed";  exit 1; }
 
 
 elif [ "$BITS" == "False" ]; then
 
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+	GCC -o $OUTPUT_FILE.o -o $OUTPUT_FILE || { echo "ERROR: exicution failed";  exit 1; }
 
 fi
 
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "Linking finished"
+	echo "GCC finished"
 
 fi
 
@@ -148,11 +146,10 @@ if [ "$QEMU" == "True" ]; then
 
 	if [ "$BITS" == "True" ]; then
 	
-		qemu-x86_64 $OUTPUT_FILE && echo ""
+		qemu-x86_64 $OUTPUT_FILE || { echo "ERROR: exicution failed";  exit 1; }
 
 	elif [ "$BITS" == "False" ]; then
-
-		qemu-i386 $OUTPUT_FILE && echo ""
+ exit 1 
 
 	fi
 

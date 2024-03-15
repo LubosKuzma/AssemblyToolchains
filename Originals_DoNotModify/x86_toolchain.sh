@@ -44,7 +44,7 @@ while [[ $# -gt 0 ]]; do
 			VERBOSE=True
 			shift # past argument
 			;;
-		-64|--x84-64)
+		-64|--x86	-64)
 			BITS=True
 			shift # past argument
 			;;
@@ -106,7 +106,7 @@ if [ "$BITS" == "True" ]; then
 
 elif [ "$BITS" == "False" ]; then
 
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
+	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
 
 fi
 
@@ -130,7 +130,7 @@ if [ "$BITS" == "True" ]; then
 
 elif [ "$BITS" == "False" ]; then
 
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
 
 fi
 

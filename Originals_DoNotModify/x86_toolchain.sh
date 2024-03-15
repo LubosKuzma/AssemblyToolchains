@@ -17,6 +17,7 @@ if [ $# -lt 1 ]; then
 	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
 	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
 	echo "-o | --output <filename>      Output filename."
+	echo "-lc| --libc                   Linking standard C library"
 
 	exit 1
 fi
@@ -29,6 +30,7 @@ BITS=False
 QEMU=False
 BREAK="_start"
 RUN=False
+LIBC=False
 while [[ $# -gt 0 ]]; do
 	case $1 in
 		-g|--gdb)
@@ -60,6 +62,10 @@ while [[ $# -gt 0 ]]; do
 			BREAK="$2"
 			shift # past argument
 			shift # past value
+			;;
+		-lc|--libc)
+			LIBC=True
+			shift # past argument
 			;;
 		-*|--*)
 			echo "Unknown option $1"
@@ -93,6 +99,7 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	Output File = $OUTPUT_FILE"
 	echo "	Verbose = $VERBOSE"
 	echo "	64 bit mode = $BITS" 
+	echo "  LIBC = $LIBC"
 	echo ""
 
 	echo "NASM started..."
@@ -123,15 +130,29 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "Linking ..."
 fi
 
+# if [ "$BITS" == "True" ]; then
+
+# 	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+
+
+# elif [ "$BITS" == "False" ]; then
+
+# 	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+
+# fi
+
 if [ "$BITS" == "True" ]; then
-
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-
+    if [ "$LIBC" == "True" ]; then
+        ld -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+    else
+        ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+    fi
 elif [ "$BITS" == "False" ]; then
-
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
+    if [ "$LIBC" == "True" ]; then
+        ld -m elf_i386 -dynamic-linker /lib/ld-linux.so.2 -lc $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+    else
+        ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+    fi
 fi
 
 

@@ -10,6 +10,7 @@ if [ $# -lt 1 ]; then
 	echo ""
 	echo "arm_toolchain.sh  [-p | --port <port number, default 12222>] <assembly filename> [-o | --output <output filename>]"
 	echo ""
+	echo "-h | --help                   Show the help message." 
 	echo "-v | --verbose                Show some information about steps performed."
 	echo "-g | --gdb                    Run gdb command on executable."
 	echo "-b | --break <break point>    Add breakpoint after running gdb. Default is main."
@@ -19,6 +20,9 @@ if [ $# -lt 1 ]; then
 	echo "-o | --output <filename>      Output filename."
 	
 	exit 1
+if [ $# -lt 1 ]; then
+    show_help
+    exit 1
 fi
 
 POSITIONAL_ARGS=()
@@ -31,6 +35,10 @@ BREAK="main"
 RUN=False
 while [[ $# -gt 0 ]]; do
 	case $1 in
+		-h|--help)
+			show_help
+			exit 0
+			;;
 		-g|--gdb)
 			GDB=True
 			shift # past argument

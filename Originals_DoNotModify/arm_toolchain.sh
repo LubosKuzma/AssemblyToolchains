@@ -39,7 +39,15 @@ while [[ $# -gt 0 ]]; do
 			show_help
 			exit 0
 			;;
+		-c|--complier)
+			compplier="$2"
+			shift #past argument
+			shift #past value
+			;;
 		-g|--gdb)
+    
+            ;;
+
 			GDB=True
 			shift # past argument
 			;;

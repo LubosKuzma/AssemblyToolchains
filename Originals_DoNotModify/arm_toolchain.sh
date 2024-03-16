@@ -46,7 +46,6 @@ while [[ $# -gt 0 ]]; do
 			;;
 		-g|--gdb)
     
-            ;;
 
 			GDB=True
 			shift # past argument

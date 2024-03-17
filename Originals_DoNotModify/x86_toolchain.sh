@@ -3,7 +3,7 @@
 # Created by Lubos Kuzma
 # ISS Program, SADT, SAIT
 # August 2022
-
+# editted so program is 64bit default and uses gcc
 
 if [ $# -lt 1 ]; then
 	echo "Usage:"
@@ -25,7 +25,8 @@ POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=False
+# turn on 64bit by making this true. Doing so should also make 64bit the default
+BITS=True
 QEMU=False
 BREAK="_start"
 RUN=False
@@ -94,32 +95,32 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	Verbose = $VERBOSE"
 	echo "	64 bit mode = $BITS" 
 	echo ""
-
-	echo "NASM started..."
+	# change nasm to gcc since this program is going to use gcc now
+	echo "GCC started..."
 
 fi
-
+# this is why changing the previous bit argument to true makes the program
 if [ "$BITS" == "True" ]; then
 
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
+	gcc -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
 
 
 elif [ "$BITS" == "False" ]; then
 
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
+	gcc -f elf $1 -o $OUTPUT_FILE.o && echo ""
 
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
+	echo "GCC finished"
 	echo "Linking ..."
 	
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
+	echo "GCC finished"
 	echo "Linking ..."
 fi
 

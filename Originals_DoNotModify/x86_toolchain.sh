@@ -15,7 +15,7 @@ if [ $# -lt 1 ]; then
 	echo "-b | --break <break point>    Add breakpoint after running gdb. Default is _start."
 	echo "-r | --run                    Run program in gdb automatically. Same as run command inside gdb env."
 	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
-	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
+	echo "-32| --x86-32                Compile for 32bit (x86-32) system."
 	echo "-o | --output <filename>      Output filename."
 
 	exit 1
@@ -25,7 +25,7 @@ POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=False
+BITS=True # Default to 64-bit
 QEMU=False
 BREAK="_start"
 RUN=False
@@ -44,8 +44,8 @@ while [[ $# -gt 0 ]]; do
 			VERBOSE=True
 			shift # past argument
 			;;
-		-64|--x84-64)
-			BITS=True
+		-32|--x84-32)
+			BITS=False		# option for 32-bit gcc compilation 
 			shift # past argument
 			;;
 		-q|--qemu)
@@ -125,12 +125,12 @@ fi
 
 if [ "$BITS" == "True" ]; then
 
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+	gcc -64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""		#gcc option for 64 bits 
 
 
 elif [ "$BITS" == "False" ]; then
 
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+	gcc -32 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""		#gcc optionn for 32 bits
 
 fi
 

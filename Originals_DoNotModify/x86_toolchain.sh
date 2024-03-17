@@ -1,4 +1,4 @@
-#! /run/current-system/sw/bin/bash
+#! /bin/bash
 
 # Created by Lubos Kuzma
 # ISS Program, SADT, SAIT

@@ -17,22 +17,26 @@ if [ $# -lt 1 ]; then
 	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
 	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
 	echo "-o | --output <filename>      Output filename."
+	echo "-e | --extra					An extra lil' easter egg"
+	echo "-h | --help 					show all options"
 
 	exit 1
 fi
 
 POSITIONAL_ARGS=()
-GDB=False
+GDB=True								# defaulted gdb to True
 OUTPUT_FILE=""
-VERBOSE=False
-BITS=False
+VERBOSE=True							# defaulted verbose to True
+BITS=True								# defaulted 64bit compilation to True
 QEMU=False
 BREAK="_start"
-RUN=False
+RUN=True								# defaulted auto running program in gdb to True
+EXTRA="False"
+HELP="False"
 while [[ $# -gt 0 ]]; do
 	case $1 in
 		-g|--gdb)
-			GDB=True
+			GDB=False					# if -g/--gdb is included, it changes to False
 			shift # past argument
 			;;
 		-o|--output)
@@ -40,20 +44,20 @@ while [[ $# -gt 0 ]]; do
 			shift # past argument
 			shift # past value
 			;;
-		-v|--verbose)
-			VERBOSE=True
+		-v|--verbose)					# if -v/--verbose is included, it changes to False
+			VERBOSE=False
 			shift # past argument
 			;;
-		-64|--x84-64)
-			BITS=True
+		-64|--x84-64)					# if -64/--x86-64 is included, it changes to False
+			BITS=False
 			shift # past argument
 			;;
 		-q|--qemu)
 			QEMU=True
 			shift # past argument
 			;;
-		-r|--run)
-			RUN=True
+		-r|--run)						# if -r/--run is included, it changes to False
+			RUN=False
 			shift # past argument
 			;;
 		-b|--break)
@@ -61,8 +65,17 @@ while [[ $# -gt 0 ]]; do
 			shift # past argument
 			shift # past value
 			;;
+		-e|--extra)
+			EXTRA="True"
+			shift # past argument
+			;;
+		-h|--help)
+			HELP="True"
+			shift # past argument
+			;;
 		-*|--*)
 			echo "Unknown option $1"
+			echo "Use -h | --help for help"
 			exit 1
 			;;
 		*)
@@ -92,10 +105,47 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	Input File = $1"
 	echo "	Output File = $OUTPUT_FILE"
 	echo "	Verbose = $VERBOSE"
-	echo "	64 bit mode = $BITS" 
+	echo "	64 bit mode = $BITS"
+	echo "  Help = $HELP"
+	echo "  Something extra = $EXTRA"
 	echo ""
 
 	echo "NASM started..."
+
+fi
+
+if [ "$HELP" == "True" ]; then
+
+	echo "Help with usage:"
+	echo "x86_toolchain.sh [ options ] <assembly filename> [-o | --output <output filename>]"
+	echo ""
+	echo "-v | --verbose                Show some information about steps performed."
+	echo "-g | --gdb                    Run gdb command on executable."
+	echo "-b | --break <break point>    Add breakpoint after running gdb. Default is _start."
+	echo "-r | --run                    Run program in gdb automatically. Same as run command inside gdb env."
+	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
+	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
+	echo "-o | --output <filename>      Output filename."
+	echo "-e | --extra                  An extra lil' easter egg"
+	echo "-h | --help                   Show all options"
+
+
+elif [ "$HELP" == "False" ]; then
+
+	echo ""
+
+fi
+
+if [ "$EXTRA" == "True" ]; then
+
+	echo ""
+	echo "Test adding an extra argument"
+	echo "This is just a little something extra"
+
+
+elif [ "$EXTRA" == "False" ]; then
+
+	echo ""
 
 fi
 

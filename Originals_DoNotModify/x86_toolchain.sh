@@ -1,22 +1,21 @@
-#! /bin/bash
+#!/bin/bash
 
-# Created by Lubos Kuzma
+# Created by Jasmeen Kaur
 # ISS Program, SADT, SAIT
-# August 2022
-
+# March 2024
 
 if [ $# -lt 1 ]; then
 	echo "Usage:"
 	echo ""
 	echo "x86_toolchain.sh [ options ] <assembly filename> [-o | --output <output filename>]"
 	echo ""
-	echo "-v | --verbose                Show some information about steps performed."
-	echo "-g | --gdb                    Run gdb command on executable."
-	echo "-b | --break <break point>    Add breakpoint after running gdb. Default is _start."
-	echo "-r | --run                    Run program in gdb automatically. Same as run command inside gdb env."
-	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
-	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
-	echo "-o | --output <filename>      Output filename."
+	echo "-v | --verbose                Display detailed information about the process."
+	echo "-g | --gdb                    Run gdb command on the executable."
+	echo "-b | --break <break point>    Specify a breakpoint after running gdb. Default is _start."
+	echo "-r | --run                    Automatically run the program in gdb. Same as 'run' command inside gdb environment."
+	echo "-q | --qemu                   Execute the program in QEMU emulator."
+	echo "-32 | --x86-32                Compile for a 32-bit (x86) system."
+	echo "-o | --output <filename>      Specify the output filename."
 
 	exit 1
 fi
@@ -25,49 +24,48 @@ POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=False
+BITS=True  # 64-bit as default
 QEMU=False
 BREAK="_start"
 RUN=False
+
 while [[ $# -gt 0 ]]; do
 	case $1 in
 		-g|--gdb)
 			GDB=True
-			shift # past argument
+			shift # move to the next argument
 			;;
 		-o|--output)
 			OUTPUT_FILE="$2"
-			shift # past argument
-			shift # past value
+			shift # move to the next argument
 			;;
 		-v|--verbose)
 			VERBOSE=True
-			shift # past argument
+			shift # move to the next argument
 			;;
-		-64|--x84-64)
-			BITS=True
-			shift # past argument
+		-32|--x86-32)
+			BITS=False
+			shift # move to the next argument
 			;;
 		-q|--qemu)
 			QEMU=True
-			shift # past argument
+			shift # move to the next argument
 			;;
 		-r|--run)
 			RUN=True
-			shift # past argument
+			shift # move to the next argument
 			;;
 		-b|--break)
 			BREAK="$2"
-			shift # past argument
-			shift # past value
+			shift # move to the next argument
 			;;
 		-*|--*)
 			echo "Unknown option $1"
 			exit 1
 			;;
 		*)
-			POSITIONAL_ARGS+=("$1") # save positional arg
-			shift # past argument
+			POSITIONAL_ARGS+=("$1") # save positional argument
+			shift # move to the next argument
 			;;
 	esac
 done
@@ -75,7 +73,7 @@ done
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
 if [[ ! -f $1 ]]; then
-	echo "Specified file does not exist"
+	echo "The specified file does not exist."
 	exit 1
 fi
 
@@ -84,7 +82,7 @@ if [ "$OUTPUT_FILE" == "" ]; then
 fi
 
 if [ "$VERBOSE" == "True" ]; then
-	echo "Arguments being set:"
+	echo "Options being set:"
 	echo "	GDB = ${GDB}"
 	echo "	RUN = ${RUN}"
 	echo "	BREAK = ${BREAK}"
@@ -92,85 +90,42 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	Input File = $1"
 	echo "	Output File = $OUTPUT_FILE"
 	echo "	Verbose = $VERBOSE"
-	echo "	64 bit mode = $BITS" 
+	echo "	64-bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
-
+	echo "GCC execution started..."
 fi
 
 if [ "$BITS" == "True" ]; then
-
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
-
-
-elif [ "$BITS" == "False" ]; then
-
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
-
+	gcc -m64 -o $OUTPUT_FILE $1 && echo ""
+else
+	gcc -m32 -o $OUTPUT_FILE $1 && echo ""
 fi
 
 if [ "$VERBOSE" == "True" ]; then
-
-	echo "NASM finished"
-	echo "Linking ..."
-	
-fi
-
-if [ "$VERBOSE" == "True" ]; then
-
-	echo "NASM finished"
-	echo "Linking ..."
-fi
-
-if [ "$BITS" == "True" ]; then
-
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-
-elif [ "$BITS" == "False" ]; then
-
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-fi
-
-
-if [ "$VERBOSE" == "True" ]; then
-
-	echo "Linking finished"
-
+	echo "GCC execution completed."
 fi
 
 if [ "$QEMU" == "True" ]; then
-
-	echo "Starting QEMU ..."
+	echo "Starting QEMU..."
 	echo ""
 
 	if [ "$BITS" == "True" ]; then
-	
 		qemu-x86_64 $OUTPUT_FILE && echo ""
-
-	elif [ "$BITS" == "False" ]; then
-
+	else
 		qemu-i386 $OUTPUT_FILE && echo ""
-
 	fi
 
 	exit 0
-	
 fi
 
 if [ "$GDB" == "True" ]; then
-
 	gdb_params=()
 	gdb_params+=(-ex "b ${BREAK}")
 
 	if [ "$RUN" == "True" ]; then
-
 		gdb_params+=(-ex "r")
-
 	fi
 
 	gdb "${gdb_params[@]}" $OUTPUT_FILE
-
 fi

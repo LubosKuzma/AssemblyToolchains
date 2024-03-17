@@ -4,6 +4,15 @@
 # ISS Program, SADT, SAIT
 # August 2022
 
+sudo apt update #Update system
+sudo apt install -y gdb python3 python3-pip
+
+sudo apt install -y gdb #Install GDB
+wget -O ~/.gdbinit-gef.py -q https://gef.blah.cat/py #Install GEF
+echo source ~/.gdbinit-gef.py >> ~/.gdbinit
+sudo apt install -y qemu-user #Install qemu-user 
+
+BITS=True #Sets default architecture to 64-bit
 
 if [ $# -lt 1 ]; then
 	echo "Usage:"

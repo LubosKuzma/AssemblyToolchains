@@ -25,7 +25,7 @@ POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=False
+BITS=True # Changed default to 64bit
 QEMU=False
 BREAK="_start"
 RUN=False
@@ -42,10 +42,6 @@ while [[ $# -gt 0 ]]; do
 			;;
 		-v|--verbose)
 			VERBOSE=True
-			shift # past argument
-			;;
-		-64|--x84-64)
-			BITS=True
 			shift # past argument
 			;;
 		-q|--qemu)

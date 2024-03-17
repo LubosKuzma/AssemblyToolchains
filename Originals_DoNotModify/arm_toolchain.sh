@@ -1,6 +1,8 @@
 #! /bin/bash
 
 # Created by Lubos Kuzma
+# Modified by Jeremiah Maulit
+# Added 64 bit and Raspberry Pi options to toolchain
 # ISS Program, SADT, SAIT
 # August 2022
 
@@ -10,14 +12,17 @@ if [ $# -lt 1 ]; then
 	echo ""
 	echo "arm_toolchain.sh  [-p | --port <port number, default 12222>] <assembly filename> [-o | --output <output filename>]"
 	echo ""
-	echo "-v | --verbose                Show some information about steps performed."
-	echo "-g | --gdb                    Run gdb command on executable."
-	echo "-b | --break <break point>    Add breakpoint after running gdb. Default is main."
-	echo "-r | --run                    Run program in gdb automatically. Same as run command inside gdb env."
-	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
-	echo "-p | --port                   Specify a port for communication between QEMU and GDB. Default is 12222."
-	echo "-o | --output <filename>      Output filename."
-	
+	echo "-v 	| --verbose                	Show some information about steps performed."
+	echo "-g 	| --gdb                    	Run gdb command on executable."
+	echo "-b 	| --break <break point>    	Add breakpoint after running gdb. Default is main."
+	echo "-r 	| --run                    	Run program in gdb automatically. Same as run command inside gdb env."
+	echo "-q 	| --qemu                   	Run executable in QEMU emulator. This will execute the program."
+	echo "-p 	| --port                   	Specify a port for communication between QEMU and GDB. Default is 12222."
+	echo "-o 	| --output <filename>      	Output filename."
+	echo "-64 	| --64bit					64-bit compilation"				#added
+	echo "-3 	| --3bras					Raspberry Pi 3B compilation"	#added
+	echo "-4 	| --4ras					Raspberry Pi 4 compilation" 	#added
+
 	exit 1
 fi
 
@@ -29,8 +34,24 @@ QEMU=False
 PORT="12222"
 BREAK="main"
 RUN=False
+64BIT=False
+RASPBERRY="3B"
+
 while [[ $# -gt 0 ]]; do
 	case $1 in
+	# modified/added arguments
+		-64|--64bit)
+			64BIT=True
+			shift
+			;;
+		-3|--3b)
+		RASPBERRY="3B"
+		shift
+		;;
+		-4|--4)
+		RASPBERRY="4"
+		shift
+		;;
 		-g|--gdb)
 			GDB=True
 			shift # past argument
@@ -86,6 +107,8 @@ fi
 
 if [ "$VERBOSE" == "True" ]; then
 	echo "Arguments being set:"
+	echo "	System 64-bit = ${64BIT}" 			#added
+	echo "	Raspberry Pi Model = ${RASPBERRY}"	#added
 	echo "	GDB = ${GDB}"
 	echo "	RUN = ${RUN}"
 	echo "	BREAK = ${BREAK}"
@@ -100,9 +123,19 @@ if [ "$VERBOSE" == "True" ]; then
 
 fi
 
-# Raspberry Pi 3B
-arm-linux-gnueabihf-gcc -ggdb -mfpu=vfp -march=armv6+fp -mabi=aapcs-linux $1 -o $OUTPUT_FILE -static -nostdlib &&
+#addded
 
+if [ "$64BIT" == "True" ]; then
+	aarch64-linux-gnu-gcc -ggdb $1 -o $OUTPUT_FILE -static -nostdlib &&
+else
+	if [ "$RASPBERRY" == "4" ]; then
+		echo "Raspberry Pi model 4 has not been implemented..."
+		exit 1
+	else
+# Raspberry Pi 3B
+	arm-linux-gnueabihf-gcc -ggdb -mfpu=vfp -march=armv6+fp -mabi=aapcs-linux $1 -o $OUTPUT_FILE -static -nostdlib &&
+	fi
+fi
 
 if [ "$VERBOSE" == "True" ]; then
 

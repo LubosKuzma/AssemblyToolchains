@@ -8,6 +8,15 @@
 # Sorry I can't figure out how to improve a shell script
 
 
+BITS=True	# Default 64bit / this is a search from the internet
+
+if [ "$BITS" == "True" ]; then
+    gcc -m64 $1 -o $OUTPUT_FILE && echo ""	# Also search from the internet, GCC automatically compile for 64bit if it see that BITS=True
+elif [ "$BITS" == "False" ]; then
+    gcc -m32 $1 -o $OUTPUT_FILE && echo ""	# Also search from the internet, GCC automatically compile for 32bit if it see that BITS=False
+fi
+
+
 if [ $# -lt 1 ]; then
 	echo "Usage:"
 	echo ""

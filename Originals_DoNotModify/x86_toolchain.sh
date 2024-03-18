@@ -101,7 +101,7 @@ fi
 
 if [ "$BITS" == "True" ]; then
 
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
+	gcc -m64 $1 -o $OUTPUT_FILE.o && echo ""		#replaced 'nasm -f elf64' with gcc -m64
 
 
 elif [ "$BITS" == "False" ]; then
@@ -113,19 +113,19 @@ fi
 if [ "$VERBOSE" == "True" ]; then
 
 	echo "NASM finished"
-	echo "Linking ..."
+	echo "Compiling with GCC ..."				# replaced 'Linking ...'
 	
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
 	echo "NASM finished"
-	echo "Linking ..."
+	echo "Compiling with GCC..."				# replaced 'Linking ...'
 fi
 
 if [ "$BITS" == "True" ]; then
 
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+	gcc -m64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""		# replaced the 'ld -m elf_x86_64' with gcc  -m64
 
 
 elif [ "$BITS" == "False" ]; then
@@ -137,7 +137,7 @@ fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "Linking finished"
+	echo "Compilation finished"		# replaced 'linking' with compilation
 
 fi
 

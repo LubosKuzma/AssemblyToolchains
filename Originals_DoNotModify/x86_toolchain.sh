@@ -5,6 +5,9 @@
 # August 2022
 
 
+# Sorry I can't figure out how to improve a shell script
+
+
 if [ $# -lt 1 ]; then
 	echo "Usage:"
 	echo ""

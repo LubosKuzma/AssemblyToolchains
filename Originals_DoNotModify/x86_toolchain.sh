@@ -4,7 +4,9 @@
 # ISS Program, SADT, SAIT
 # August 2022
 
+# This script compiles and links assembly code using GCC for x86-64 architecture.
 
+# Function to display usage information
 if [ $# -lt 1 ]; then
 	echo "Usage:"
 	echo ""
@@ -20,15 +22,17 @@ if [ $# -lt 1 ]; then
 
 	exit 1
 fi
-
+# Initialize variables with default values
 POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=True # Changed default to 64bit
+BITS=True # Default to 64-bit
 QEMU=False
 BREAK="_start"
 RUN=False
+
+# Parse command line options
 while [[ $# -gt 0 ]]; do
 	case $1 in
 		-g|--gdb)
@@ -44,6 +48,10 @@ while [[ $# -gt 0 ]]; do
 			VERBOSE=True
 			shift # past argument
 			;;
+		-64|--x86-64)
+          	  	BITS=true
+            		shift # past argument
+            		;;
 		-q|--qemu)
 			QEMU=True
 			shift # past argument
@@ -70,15 +78,24 @@ done
 
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
+# Check if source file is provided
+if [ $# -lt 1 ]; then
+	echo "Error: Source filename is missing!"
+ 	usage
+fi
+
+# Check if source file exists
 if [[ ! -f $1 ]]; then
-	echo "Specified file does not exist"
+	echo "Error: Specified file '$1' does not exist"
 	exit 1
 fi
 
+# Set output file if not provided
 if [ "$OUTPUT_FILE" == "" ]; then
 	OUTPUT_FILE=${1%.*}
 fi
 
+# Display verbose information if enabled
 if [ "$VERBOSE" == "True" ]; then
 	echo "Arguments being set:"
 	echo "	GDB = ${GDB}"
@@ -91,33 +108,39 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	64 bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
+	echo "GCC started..."
 
 fi
 
+# Function for compilation
+compile_source() {
+	local SOURCE_FILE="$1"
+ 	local OUTPUT_FILE="$2"
+
+# Compile source file with GCC for x86_64 architecture
 if [ "$BITS" == "True" ]; then
-
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
-
+ 
+  	gcc -m64 -o "$OUTPUT_FILE" "$1" && echo ""
 
 elif [ "$BITS" == "False" ]; then
-
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
-
+	# Link object file for x86_64 architecture
+  	gcc -o "$OUTPUT_FILE" "$1" && echo ""
+   
 fi
+}
 
+# Display verbose information if enabled
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
+	echo "GCC finished"
 	echo "Linking ..."
 	
 fi
 
-if [ "$VERBOSE" == "True" ]; then
-
-	echo "NASM finished"
-	echo "Linking ..."
-fi
+# Function for linking
+link_object() {
+	local OBJECT_FILE="$1"
+ 	local OUTPUT_FILE="$2"
 
 if [ "$BITS" == "True" ]; then
 
@@ -129,13 +152,21 @@ elif [ "$BITS" == "False" ]; then
 	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
 
 fi
-
+}
 
 if [ "$VERBOSE" == "True" ]; then
 
 	echo "Linking finished"
 
 fi
+
+# Main function
+parse_arguments "$@"
+SOURCE_FILE="$1"
+OUTPUT_FILE="$OUTPUT_FILE"
+
+compile_source "$SOURCE_FILE" "$OUTPUT_FILE"
+link_object "$OUTPUT_FILE" "$OUTPUT_FILE"
 
 if [ "$QEMU" == "True" ]; then
 
@@ -156,6 +187,7 @@ if [ "$QEMU" == "True" ]; then
 	
 fi
 
+# Run GDB if requested
 if [ "$GDB" == "True" ]; then
 
 	gdb_params=()
@@ -170,3 +202,6 @@ if [ "$GDB" == "True" ]; then
 	gdb "${gdb_params[@]}" $OUTPUT_FILE
 
 fi
+
+# Invoke main function with command line arguments
+main "$@"

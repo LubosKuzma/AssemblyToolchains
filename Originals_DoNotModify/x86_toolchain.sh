@@ -1,6 +1,7 @@
 #! /bin/bash
 
 # Created by Lubos Kuzma
+# Edited by Grayden Stangness
 # ISS Program, SADT, SAIT
 # August 2022
 

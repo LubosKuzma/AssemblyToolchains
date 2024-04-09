@@ -4,6 +4,9 @@
 # ISS Program, SADT, SAIT
 # August 2022
 
+show_status() {
+	echo "[$9date '+%Y-%m-%d %H:%M:%S')] $1"
+}
 
 if [ $# -lt 1 ]; then
 	echo "Usage:"
@@ -26,14 +29,14 @@ POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=True 	# this sets x86_64 (64 bit) as default
+BITS=True 	# sets x86_64 (64 bit) as default
 QEMU=False
 BREAK="_start"
 RUN=False
 UPDATE=False
 while [[ $# -gt 0 ]]; do
 	case $1 in
-		-u|--update)
+		-u|--update)			# New argument allows user to specify if they would like their system updated before executing other arguments
   			UPDATE=True
      			shift # past argument
 			;;
@@ -80,6 +83,11 @@ done
 
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
+update_system() {				# Function that updates/upgrades the system while presenting status and messages to inform the user
+	show_status "Updating system..."
+ 	sudo apt update && show_status "Update complete" 			
+  	sudo apt upgrade-y && show_status "Upgrade complete" 
+
 if [[ ! -f $1 ]]; then
 	echo "Specified file does not exist"
 	exit 1
@@ -90,8 +98,7 @@ if [ "$OUTPUT_FILE" == "" ]; then
 fi
 
 if [ "$UPDATE" == "True" ]; then
-	sudo apt update
- 	sudo apt upgrade
+	update_system
 fi
 
 if [ "$VERBOSE" == "True" ]; then
@@ -113,59 +120,50 @@ fi
 if [ "$BITS" == "True" ]; then
 
 	
- 	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
+ 	nasm -f elf64 $1 -o $OUTPUT_FILE.o && show_status "Assembly complete"
 
 
 elif [ "$BITS" == "False" ]; then
 
  
-	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
+	nasm -f elf $1 -o $OUTPUT_FILE.o && show_status "Assembly complete"
 
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
 	echo "NASM finished"
-	echo "Linking ..."
-	
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
 	echo "NASM finished"
-	echo "Linking ..."
 fi
 
 if [ "$BITS" == "True" ]; then
 
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
+	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && show_status "Linking process complete"
 
 
 elif [ "$BITS" == "False" ]; then
 
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && echo ""
-
-fi
-
-
-if [ "$VERBOSE" == "True" ]; then
-
-	echo "Linking finished"
+	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && show_status "Linking process complete"
 
 fi
 
 if [ "$QEMU" == "True" ]; then
 
+ 	show_status
 	echo "Starting QEMU ..."
 	echo ""
 
 	if [ "$BITS" == "True" ]; then
 	
-		qemu-x86_64 $OUTPUT_FILE && echo ""
+		qemu-x86_64 $OUTPUT_FILE && show_status "Process Complete"
 
 	elif [ "$BITS" == "False" ]; then
 
-		qemu-i386 $OUTPUT_FILE && echo ""
+		qemu-i386 $OUTPUT_FILE && show_status "Process Complete"
 
 	fi
 

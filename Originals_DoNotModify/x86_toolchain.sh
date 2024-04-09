@@ -4,7 +4,7 @@
 # ISS Program, SADT, SAIT
 # August 2022
 
-show_status() {
+show_status() {					# Function echos the date and time, and takes an argument
 	echo "[$9date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
@@ -20,7 +20,7 @@ if [ $# -lt 1 ]; then
 	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
 	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
 	echo "-o | --output <filename>      Output filename."
- 	echo "-u | --update 		    Updates system before executing specified arguments 
+ 	echo "-u | --update 		    Updates system before executing specified arguments 	
 
 	exit 1
 fi
@@ -86,10 +86,11 @@ set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 update_system() {				# Function that updates/upgrades the system while presenting status and messages to inform the user
 	show_status "Updating system..."
  	sudo apt update && show_status "Update complete" 			
-  	sudo apt upgrade-y && show_status "Upgrade complete" 
+  	sudo apt upgrade -y && show_status "Upgrade complete" 
+}
 
 if [[ ! -f $1 ]]; then
-	echo "Specified file does not exist"
+	show_status "Specified file '$1' does not exist"		# Added status and file argument to specify reason for exit
 	exit 1
 fi
 
@@ -98,7 +99,7 @@ if [ "$OUTPUT_FILE" == "" ]; then
 fi
 
 if [ "$UPDATE" == "True" ]; then
-	update_system
+	update_system			# Calls to update_system function
 fi
 
 if [ "$VERBOSE" == "True" ]; then
@@ -113,60 +114,62 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	64 bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
+	show_status "NASM started..."		# Added Status
 
 fi
 
 if [ "$BITS" == "True" ]; then
 
 	
- 	nasm -f elf64 $1 -o $OUTPUT_FILE.o && show_status "Assembly complete"
+ 	nasm -f elf64 $1 -o $OUTPUT_FILE.o && show_status "Assembly complete"		# Added Status
 
 
 elif [ "$BITS" == "False" ]; then
 
  
-	nasm -f elf $1 -o $OUTPUT_FILE.o && show_status "Assembly complete"
+	nasm -f elf $1 -o $OUTPUT_FILE.o && show_status "Assembly complete"		# Added Status
 
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
+	show_status "NASM finished"			# Added Status
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
+	show_status "NASM finished"			# Added Status
 fi
 
 if [ "$BITS" == "True" ]; then
 
-	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && show_status "Linking process complete"
+	ld -m elf_x86_64 $OUTPUT_FILE.o -o $OUTPUT_FILE && show_status "Linking process complete"	# Added Status
 
 
 elif [ "$BITS" == "False" ]; then
 
-	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && show_status "Linking process complete"
+	ld -m elf_i386 $OUTPUT_FILE.o -o $OUTPUT_FILE && show_status "Linking process complete"		# Added Status
 
 fi
 
 if [ "$QEMU" == "True" ]; then
 
- 	show_status
-	echo "Starting QEMU ..."
+ 	
+	show_status "Starting QEMU ..."				# Added Status
 	echo ""
 
 	if [ "$BITS" == "True" ]; then
 	
-		qemu-x86_64 $OUTPUT_FILE && show_status "Process Complete"
+		qemu-x86_64 $OUTPUT_FILE && show_status "Process Complete"	# Added Status
 
 	elif [ "$BITS" == "False" ]; then
 
-		qemu-i386 $OUTPUT_FILE && show_status "Process Complete"
+		qemu-i386 $OUTPUT_FILE && show_status "Process Complete"	# Added Status 
 
 	fi
 
+ 	show_status "Exiting QEMU..."		# Added status and string to communicate with user more effectively
+  
 	exit 0
 	
 fi
@@ -178,7 +181,8 @@ if [ "$GDB" == "True" ]; then
 
 	if [ "$RUN" == "True" ]; then
 
-		gdb_params+=(-ex "r")
+		show_status "Running GDB..."	# Added Status
+  		gdb_params+=(-ex "r")
 
 	fi
 

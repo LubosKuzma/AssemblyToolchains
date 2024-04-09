@@ -17,6 +17,7 @@ if [ $# -lt 1 ]; then
 	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
 	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
 	echo "-o | --output <filename>      Output filename."
+ 	echo "-u | --update 		    Updates system before executing specified arguments 
 
 	exit 1
 fi
@@ -29,9 +30,14 @@ BITS=True 	# this sets x86_64 (64 bit) as default
 QEMU=False
 BREAK="_start"
 RUN=False
+UPDATE=False
 while [[ $# -gt 0 ]]; do
 	case $1 in
-		-g|--gdb)
+		-u|--update)
+  			UPDATE=True
+     			shift # past argument
+			;;
+  		-g|--gdb)
 			GDB=True
 			shift # past argument
 			;;
@@ -44,8 +50,8 @@ while [[ $# -gt 0 ]]; do
 			VERBOSE=True
 			shift # past argument
 			;;
-		-64|--x84-64)
-			BITS=True
+		-32|--x84-32)			# New argument that allows the user to specify if they want to use 32 bit
+			BITS=False
 			shift # past argument
 			;;
 		-q|--qemu)
@@ -83,6 +89,11 @@ if [ "$OUTPUT_FILE" == "" ]; then
 	OUTPUT_FILE=${1%.*}
 fi
 
+if [ "$UPDATE" == "True" ]; then
+	sudo apt update
+ 	sudo apt upgrade
+fi
+
 if [ "$VERBOSE" == "True" ]; then
 	echo "Arguments being set:"
 	echo "	GDB = ${GDB}"
@@ -101,11 +112,13 @@ fi
 
 if [ "$BITS" == "True" ]; then
 
-	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
+	
+ 	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
 
 
 elif [ "$BITS" == "False" ]; then
 
+ 
 	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
 
 fi
